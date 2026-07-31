@@ -5,7 +5,6 @@ const professionalContact = {
   phone: '(55) 5583-1780',
   email: 'angelmonterocruz19@gmail.com',
   linkedin: 'https://www.linkedin.com/in/angel-uriel-montero-cruz-394355422/',
-  github: '',
   portfolioUrl: '',
 }
 
@@ -541,7 +540,7 @@ document.querySelector('#app').innerHTML = `
           ${renderContactItem('Teléfono', professionalContact.phone, 'tel')}
           ${renderContactItem('Correo profesional', professionalContact.email, 'email')}
           ${renderContactItem('LinkedIn', professionalContact.linkedin)}
-         
+
           ${cvAvailable ? `
             <div class="contact-item contact-item-cv">
               <div>
