@@ -488,9 +488,9 @@ document.querySelector('#app').innerHTML = `
             <h3>Formación complementaria</h3>
             <ul>
               <li><strong>Scrum Fundamentals</strong><span>SCRUMstudy, 2026</span></li>
-              <li><strong>Introducción a la gestión de proyectos</strong><span>2026</span></li>
+              <li><strong>Introducción a la gestión de proyectos</strong><span>Project Management Institute, 2026</span></li>
               <li><strong>PMBOK y SBOK</strong><span>Estudio y aplicación en proyectos</span></li>
-              <li><strong>Programación básica con Python</strong><span>2026</span></li>
+              <li><strong>Programación básica con Python</strong><span>MOOC, 2026</span></li>
             </ul>
             <p class="education-note">Formación complementaria; no se presenta como certificación profesional.</p>
           </article>

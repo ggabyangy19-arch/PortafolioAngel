@@ -25,4 +25,4 @@ dist-ssr
 # Environment variables
 .env
 .env.*
-!.env.example
+!.env.examplegit remote add origin https://github.com/TU-USUARIO/portafolio-galaxy.git
