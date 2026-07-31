@@ -2,6 +2,7 @@ import './style.css'
 
 // Replace each empty value with the verified professional contact detail.
 const professionalContact = {
+  phone: '',
   email: '',
   linkedin: '',
   github: '',
@@ -57,10 +58,19 @@ function renderCvAction(className, label, statusId) {
 
 function renderContactItem(label, value, type = 'url') {
   if (!value) {
-    return ''
+    return `
+      <div class="contact-item contact-item-pending">
+        <span>${label}</span>
+        <strong>Pendiente de agregar</strong>
+      </div>
+    `
   }
 
-  const href = type === 'email' ? `mailto:${value}` : value
+  const href = type === 'email'
+    ? `mailto:${value}`
+    : type === 'tel'
+      ? `tel:${value.replace(/\s+/g, '')}`
+      : value
 
   return `
     <a href="${href}" class="contact-item"${type === 'url' ? ' target="_blank" rel="noopener noreferrer"' : ''}>
@@ -528,10 +538,9 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="contact-links">
-          ${renderContactItem('Correo profesional', professionalContact.email, 'email')}
-          ${renderContactItem('LinkedIn', professionalContact.linkedin)}
-          ${renderContactItem('GitHub', professionalContact.github)}
-          ${renderContactItem('URL pública del portafolio', professionalContact.portfolioUrl)}
+          ${renderContactItem('Teléfono', professionalContact.phone, '(55) 5583-1780')}
+          ${renderContactItem('Correo profesional', professionalContact.email, 'angelmonterocruz19@gmail.com')}
+          ${renderContactItem('LinkedIn', professionalContact.linkedin, 'https://www.linkedin.com/in/angel-uriel-montero-cruz-394355422/')}
           ${cvAvailable ? `
             <div class="contact-item contact-item-cv">
               <div>
