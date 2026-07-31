@@ -2,7 +2,7 @@ import './style.css'
 
 // Replace each empty value with the verified professional contact detail.
 const professionalContact = {
-  phone: '(55) 5583-1780',
+  phone: '(55) 8358-1780',
   email: 'angelmonterocruz19@gmail.com',
   linkedin: 'https://www.linkedin.com/in/angel-uriel-montero-cruz-394355422/',
   portfolioUrl: '',
