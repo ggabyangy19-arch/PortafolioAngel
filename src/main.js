@@ -2,9 +2,9 @@ import './style.css'
 
 // Replace each empty value with the verified professional contact detail.
 const professionalContact = {
-  phone: '',
-  email: '',
-  linkedin: '',
+  phone: '(55) 5583-1780',
+  email: 'angelmonterocruz19@gmail.com',
+  linkedin: 'https://www.linkedin.com/in/angel-uriel-montero-cruz-394355422/',
   github: '',
   portfolioUrl: '',
 }
@@ -538,9 +538,10 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="contact-links">
-          ${renderContactItem('Teléfono', professionalContact.phone, '(55) 5583-1780')}
-          ${renderContactItem('Correo profesional', professionalContact.email, 'angelmonterocruz19@gmail.com')}
-          ${renderContactItem('LinkedIn', professionalContact.linkedin, 'https://www.linkedin.com/in/angel-uriel-montero-cruz-394355422/')}
+          ${renderContactItem('Teléfono', professionalContact.phone, 'tel')}
+          ${renderContactItem('Correo profesional', professionalContact.email, 'email')}
+          ${renderContactItem('LinkedIn', professionalContact.linkedin)}
+          ${renderContactItem('GitHub', professionalContact.github)}
           ${cvAvailable ? `
             <div class="contact-item contact-item-cv">
               <div>
