@@ -541,7 +541,7 @@ document.querySelector('#app').innerHTML = `
           ${renderContactItem('Teléfono', professionalContact.phone, 'tel')}
           ${renderContactItem('Correo profesional', professionalContact.email, 'email')}
           ${renderContactItem('LinkedIn', professionalContact.linkedin)}
-          ${renderContactItem('GitHub', professionalContact.github)}
+         
           ${cvAvailable ? `
             <div class="contact-item contact-item-cv">
               <div>
