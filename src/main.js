@@ -1,11 +1,12 @@
 import './style.css'
+import { projects } from './data/projects.js'
 
 // Replace each empty value with the verified professional contact detail.
 const professionalContact = {
   phone: '(55) 8358-1780',
   email: 'angelmonterocruz19@gmail.com',
   linkedin: 'https://www.linkedin.com/in/angel-uriel-montero-cruz-394355422/',
-  portfolioUrl: '',
+  github: 'https://github.com/angelmon19',
 }
 
 // Place the PDF at public/documents/cv-angel-uriel-montero-cruz.pdf,
@@ -82,15 +83,126 @@ function renderContactItem(label, value, type = 'url') {
   `
 }
 
+const repositoryIcon = `
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M9 19c-4.5 1.4-4.5-2.5-6-3m12 6v-3.9c0-1.1.1-1.6-.5-2.3 3.3-.4 6.8-1.6 6.8-7.4A5.8 5.8 0 0 0 19.8 4a5.4 5.4 0 0 0-.2-4S18.4-.4 15.5 1.5a14 14 0 0 0-7 0C5.6-.4 4.4 0 4.4 0a5.4 5.4 0 0 0-.2 4 5.8 5.8 0 0 0-1.5 4.4c0 5.8 3.5 7 6.8 7.4-.5.6-.6 1.3-.5 2.3V22" />
+  </svg>
+`
+
+function renderProjectPreview(project) {
+  if (project.preview) {
+    return `
+      <img
+        src="${project.preview.src}"
+        alt="${project.preview.alt}"
+        width="1200"
+        height="750"
+        ${project.id === 'nia' ? 'fetchpriority="high"' : 'loading="lazy"'}
+      />
+    `
+  }
+
+  return `
+    <div class="project-preview-placeholder" role="img" aria-label="Vista previa de ${project.name} pendiente de agregar">
+      <div class="preview-grid" aria-hidden="true"></div>
+      <span class="preview-code" aria-hidden="true">${project.code}</span>
+      <div class="preview-message">
+        <span>Vista previa</span>
+        <strong>Captura pendiente de integrar</strong>
+      </div>
+    </div>
+  `
+}
+
+function renderRepositoryAction(repository) {
+  if (repository.state === 'available') {
+    return `
+      <a class="project-repository" href="${repository.url}" target="_blank" rel="noopener noreferrer">
+        ${repositoryIcon}
+        <span>Ver repositorio</span>
+      </a>
+    `
+  }
+
+  return `
+    <span class="project-repository project-repository-pending" aria-disabled="true">
+      ${repositoryIcon}
+      <span>${repository.message}</span>
+    </span>
+  `
+}
+
+function renderProject(project, index) {
+  const isOpen = index === 0
+  const number = String(index + 1).padStart(2, '0')
+
+  return `
+    <article class="project-file${isOpen ? ' project-file-open' : ''}" data-project-file>
+      <h3 class="project-file-heading">
+        <button
+          class="project-trigger"
+          type="button"
+          id="project-trigger-${project.id}"
+          aria-expanded="${isOpen}"
+          aria-controls="project-panel-${project.id}"
+        >
+          <span class="project-number">${number}</span>
+          <span class="project-identity">
+            <span class="project-code">${project.code}</span>
+            <span class="project-name">${project.name}</span>
+          </span>
+          <span class="project-discipline">${project.category}</span>
+          <span class="project-status project-status-${project.statusTone}">${project.status}</span>
+          <span class="project-toggle-mark" aria-hidden="true"></span>
+        </button>
+      </h3>
+
+      <div
+        class="project-panel"
+        id="project-panel-${project.id}"
+        role="region"
+        aria-labelledby="project-trigger-${project.id}"
+        ${isOpen ? '' : 'hidden'}
+      >
+        <div class="project-panel-inner">
+          <div class="project-preview">
+            ${renderProjectPreview(project)}
+          </div>
+
+          <div class="project-information">
+            <p class="project-summary">${project.summary}</p>
+
+            <dl class="project-details">
+              ${project.details.map((detail) => `
+                <div>
+                  <dt>${detail.label}</dt>
+                  <dd>${detail.value}</dd>
+                </div>
+              `).join('')}
+            </dl>
+
+            <div class="project-footer">
+              <ul class="tags" aria-label="Tecnologías de ${project.name}">
+                ${project.technologies.map((technology) => `<li>${technology}</li>`).join('')}
+              </ul>
+              ${renderRepositoryAction(project.repository)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  `
+}
+
 document.querySelector('#app').innerHTML = `
-  <button type="button" class="skip-link" data-scroll-target="contenido-principal">Saltar al contenido</button>
+  <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
 
   <header class="header">
     <nav class="navbar container" aria-label="Navegación principal">
-      <button type="button" class="logo logo-button" data-scroll-target="inicio" aria-label="Ir al inicio">
+      <a class="logo logo-button" href="#inicio" aria-label="Ir al inicio">
         <span class="logo-mark" aria-hidden="true">AU</span>
         <span>Angel Uriel</span>
-      </button>
+      </a>
 
       <button
         class="menu-toggle"
@@ -104,12 +216,12 @@ document.querySelector('#app').innerHTML = `
       </button>
 
       <div class="nav-menu" id="nav-menu">
-        <button type="button" class="nav-link active" data-scroll-target="inicio" aria-current="location">Inicio</button>
-        <button type="button" class="nav-link" data-scroll-target="perfil">Perfil</button>
-        <button type="button" class="nav-link" data-scroll-target="proyectos">Proyectos</button>
-        <button type="button" class="nav-link" data-scroll-target="competencias">Competencias</button>
-        <button type="button" class="nav-link" data-scroll-target="formacion">Formación</button>
-        <button type="button" class="nav-link" data-scroll-target="contacto">Contacto</button>
+        <a class="nav-link active" href="#inicio" aria-current="location">Inicio</a>
+        <a class="nav-link" href="#perfil">Perfil</a>
+        <a class="nav-link" href="#proyectos">Proyectos</a>
+        <a class="nav-link" href="#competencias">Competencias</a>
+        <a class="nav-link" href="#formacion">Formación</a>
+        <a class="nav-link" href="#contacto">Contacto</a>
       </div>
     </nav>
   </header>
@@ -135,13 +247,13 @@ document.querySelector('#app').innerHTML = `
           </p>
 
           <div class="hero-actions">
-            <button type="button" class="button button-primary" data-scroll-target="proyectos">
+            <a class="button button-primary" href="#proyectos">
               Ver casos de proyecto
-            </button>
+            </a>
 
             ${renderCvAction('button button-secondary', 'Descargar CV', 'hero-cv-status')}
 
-            <button type="button" class="button button-text" data-scroll-target="contacto">Contactar</button>
+            <a class="button button-text" href="#contacto">Contactar</a>
           </div>
 
           <p class="availability">
@@ -265,166 +377,8 @@ document.querySelector('#app').innerHTML = `
           </p>
         </div>
 
-        <div class="projects-grid">
-          <article class="project-card project-featured">
-            <div class="project-visual project-visual-sgi" aria-hidden="true">
-              <span class="project-code">SGI</span>
-              <span class="project-index">Caso 01</span>
-            </div>
-            <div class="project-content">
-              <div class="project-header">
-                <span class="project-type">Proyecto académico y de desarrollo</span>
-                <span class="project-status">En desarrollo</span>
-              </div>
-              <h3>Sistema de Gestión Industrial — SGI</h3>
-              <dl class="project-details">
-                <div>
-                  <dt>Contexto</dt>
-                  <dd>Propuesta para centralizar información de producción, maquinaria, operadores, inventarios, mantenimiento y sensores industriales.</dd>
-                </div>
-                <div>
-                  <dt>Mi participación</dt>
-                  <dd>Planeación del proyecto, análisis funcional, documentación, diseño de base de datos y desarrollo de módulos web.</dd>
-                </div>
-                <div>
-                  <dt>Gestión aplicada</dt>
-                  <dd>Project Charter, interesados, alcance, EDT/WBS, cronograma, matriz RACI, comunicaciones y enfoque híbrido PMI–Scrum.</dd>
-                </div>
-                <div>
-                  <dt>Alcance técnico</dt>
-                  <dd>PHP, MySQL, JavaScript, Bootstrap, Power BI, ESP32 y OEE.</dd>
-                </div>
-                <div>
-                  <dt>Resultado actual</dt>
-                  <dd>Arquitectura funcional, documentación del proyecto, base de datos y módulos iniciales de captura y consulta.</dd>
-                </div>
-              </dl>
-              <div class="tags" aria-label="Tecnologías del proyecto">
-                <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>Power BI</span><span>ESP32</span>
-              </div>
-              <span class="project-availability">Caso sin enlace público</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-visual project-visual-robot" aria-hidden="true">
-              <span class="project-code">AI</span>
-              <span class="project-index">Caso 02</span>
-            </div>
-            <div class="project-content">
-              <div class="project-header">
-                <span class="project-type">Proyecto multidisciplinario</span>
-                <span class="project-status">Planeación y desarrollo</span>
-              </div>
-              <h3>Brazo robótico controlado por gestos e inteligencia artificial</h3>
-              <dl class="project-details">
-                <div>
-                  <dt>Contexto</dt>
-                  <dd>Propuesta para controlar un brazo robótico mediante gestos, sensores e inteligencia artificial con orientación industrial.</dd>
-                </div>
-                <div>
-                  <dt>Mi participación</dt>
-                  <dd>Project Manager del equipo de cuatro integrantes.</dd>
-                </div>
-                <div>
-                  <dt>Gestión aplicada</dt>
-                  <dd>Distribución de responsabilidades, definición de objetivos, entregables, cronograma, riesgos y aplicaciones industriales.</dd>
-                </div>
-                <div>
-                  <dt>Alcance técnico</dt>
-                  <dd>Robótica, sensores, simulación, reconocimiento de gestos e IA.</dd>
-                </div>
-                <div>
-                  <dt>Resultado actual</dt>
-                  <dd>Planeación del proyecto, definición de roles y análisis técnico inicial.</dd>
-                </div>
-              </dl>
-              <div class="tags" aria-label="Tecnologías del proyecto">
-                <span>Robótica</span><span>Sensores</span><span>Simulación</span><span>IA</span>
-              </div>
-              <span class="project-availability">Caso sin enlace público</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-visual project-visual-sos" aria-hidden="true">
-              <span class="project-code">SOS</span>
-              <span class="project-index">Caso 03</span>
-            </div>
-            <div class="project-content">
-              <div class="project-header">
-                <span class="project-type">Prototipo IoT</span>
-                <span class="project-status project-status-complete">Concluido y funcional</span>
-              </div>
-              <h3>Pulsera SOS con ESP32 y GPS</h3>
-              <dl class="project-details">
-                <div>
-                  <dt>Contexto</dt>
-                  <dd>Dispositivo para enviar alertas y coordenadas GPS a un sistema web.</dd>
-                </div>
-                <div>
-                  <dt>Mi participación</dt>
-                  <dd>Integración de hardware, backend, base de datos y dashboard.</dd>
-                </div>
-                <div>
-                  <dt>Gestión aplicada</dt>
-                  <dd>No documentada como metodología formal para este caso.</dd>
-                </div>
-                <div>
-                  <dt>Alcance técnico</dt>
-                  <dd>ESP32, GPS NEO-6M, PlatformIO, PHP, MySQL y Bootstrap.</dd>
-                </div>
-                <div>
-                  <dt>Resultado</dt>
-                  <dd>Prototipo funcional capaz de registrar alertas y mostrar ubicación, fecha, dispositivo, batería y nivel de alerta desde diferentes equipos.</dd>
-                </div>
-              </dl>
-              <div class="tags" aria-label="Tecnologías del proyecto">
-                <span>ESP32</span><span>GPS NEO-6M</span><span>PlatformIO</span><span>PHP</span><span>MySQL</span>
-              </div>
-              <span class="project-availability">Caso sin enlace público</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-visual project-visual-pm" aria-hidden="true">
-              <span class="project-code">PM</span>
-              <span class="project-index">Caso 04</span>
-            </div>
-            <div class="project-content">
-              <div class="project-header">
-                <span class="project-type">Sistema web</span>
-                <span class="project-status">Conceptualización y planeación</span>
-              </div>
-              <h3>Plataforma de gestión PMI y Scrum</h3>
-              <dl class="project-details">
-                <div>
-                  <dt>Contexto</dt>
-                  <dd>Plataforma para administrar proyectos tradicionales, ágiles e híbridos.</dd>
-                </div>
-                <div>
-                  <dt>Mi participación</dt>
-                  <dd>Definición de alcance, procesos, roles, artefactos, permisos y arquitectura funcional.</dd>
-                </div>
-                <div>
-                  <dt>Gestión aplicada</dt>
-                  <dd>PMBOK, SBOK, Scrum, backlog, sprints, documentación y trazabilidad.</dd>
-                </div>
-                <div>
-                  <dt>Alcance técnico</dt>
-                  <dd>Arquitectura funcional de un sistema web; tecnologías pendientes de documentar.</dd>
-                </div>
-                <div>
-                  <dt>Resultado actual</dt>
-                  <dd>Definición inicial del producto y estructura funcional.</dd>
-                </div>
-              </dl>
-              <div class="tags" aria-label="Enfoques del proyecto">
-                <span>PMBOK</span><span>SBOK</span><span>Scrum</span><span>Backlog</span><span>Trazabilidad</span>
-              </div>
-              <span class="project-availability">Caso sin enlace público</span>
-            </div>
-          </article>
+        <div class="projects-list">
+          ${projects.map(renderProject).join('')}
         </div>
       </div>
     </section>
@@ -540,6 +494,7 @@ document.querySelector('#app').innerHTML = `
           ${renderContactItem('Teléfono', professionalContact.phone, 'tel')}
           ${renderContactItem('Correo profesional', professionalContact.email, 'email')}
           ${renderContactItem('LinkedIn', professionalContact.linkedin)}
+          ${renderContactItem('GitHub', professionalContact.github)}
 
           ${cvAvailable ? `
             <div class="contact-item contact-item-cv">
@@ -570,8 +525,9 @@ document.querySelector('#app').innerHTML = `
 const menuToggle = document.querySelector('#menu-toggle')
 const navMenu = document.querySelector('#nav-menu')
 const navLinks = [...document.querySelectorAll('.nav-link')]
-const scrollButtons = [...document.querySelectorAll('[data-scroll-target]')]
 const sections = [...document.querySelectorAll('[data-nav-section]')]
+const projectFiles = [...document.querySelectorAll('[data-project-file]')]
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 function setMenuState(isOpen, { restoreFocus = false } = {}) {
   navMenu.classList.toggle('nav-menu-open', isOpen)
@@ -583,18 +539,14 @@ function setMenuState(isOpen, { restoreFocus = false } = {}) {
   menuToggle.innerHTML = isOpen ? closeIcon : menuIcon
 
   if (isOpen) {
-    window.requestAnimationFrame(() => navLinks[0].focus())
+    window.requestAnimationFrame(() => {
+      if (menuToggle.getAttribute('aria-expanded') === 'true') {
+        navLinks[0].focus()
+      }
+    })
   } else if (restoreFocus) {
     menuToggle.focus()
   }
-}
-
-function scrollToSection(sectionId) {
-  const targetSection = document.getElementById(sectionId)
-
-  if (!targetSection) return
-
-  targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 menuToggle.addEventListener('click', () => {
@@ -602,16 +554,40 @@ menuToggle.addEventListener('click', () => {
   setMenuState(willOpen, { restoreFocus: !willOpen })
 })
 
-scrollButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    scrollToSection(button.dataset.scrollTarget)
+navLinks.forEach((link) => {
+  link.addEventListener('click', () => {
     setMenuState(false, { restoreFocus: window.innerWidth <= 760 })
   })
 })
 
-navLinks.forEach((link) => {
-  link.addEventListener('click', () => {
-    setMenuState(false, { restoreFocus: window.innerWidth <= 760 })
+function setOpenProject(selectedFile) {
+  projectFiles.forEach((projectFile) => {
+    const trigger = projectFile.querySelector('.project-trigger')
+    const panel = projectFile.querySelector('.project-panel')
+    const isSelected = projectFile === selectedFile
+
+    projectFile.classList.toggle('project-file-open', isSelected)
+    trigger.setAttribute('aria-expanded', String(isSelected))
+    panel.hidden = !isSelected
+
+    if (isSelected && !prefersReducedMotion.matches) {
+      panel.animate(
+        [
+          { opacity: 0, transform: 'translateY(-8px)' },
+          { opacity: 1, transform: 'translateY(0)' },
+        ],
+        { duration: 260, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+      )
+    }
+  })
+}
+
+projectFiles.forEach((projectFile) => {
+  const trigger = projectFile.querySelector('.project-trigger')
+
+  trigger.addEventListener('click', () => {
+    if (trigger.getAttribute('aria-expanded') === 'true') return
+    setOpenProject(projectFile)
   })
 })
 
@@ -622,7 +598,8 @@ document.addEventListener('keydown', (event) => {
 })
 
 document.addEventListener('click', (event) => {
-  const clickedOutside = !navMenu.contains(event.target) && !menuToggle.contains(event.target)
+  const eventPath = event.composedPath()
+  const clickedOutside = !eventPath.includes(navMenu) && !eventPath.includes(menuToggle)
 
   if (clickedOutside && menuToggle.getAttribute('aria-expanded') === 'true') {
     setMenuState(false)
@@ -645,7 +622,7 @@ if ('IntersectionObserver' in window) {
       if (!visibleEntry) return
 
       navLinks.forEach((link) => {
-        const isCurrent = link.dataset.scrollTarget === visibleEntry.target.id
+        const isCurrent = link.hash === `#${visibleEntry.target.id}`
         link.classList.toggle('active', isCurrent)
 
         if (isCurrent) {

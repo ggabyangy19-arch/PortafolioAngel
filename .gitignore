@@ -25,4 +25,7 @@ dist-ssr
 # Environment variables
 .env
 .env.*
-!.env.examplegit remote add origin https://github.com/TU-USUARIO/portafolio-galaxy.git
+!.env.example
+
+# Local design and brainstorming artifacts
+.superpowers/
