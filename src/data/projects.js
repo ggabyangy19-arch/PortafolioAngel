@@ -1,3 +1,39 @@
+const galleryPhases = [
+  {
+    phase: 'Concepto',
+    title: 'Definición inicial',
+    description: 'Espacio reservado para documentar el planteamiento y los primeros esquemas del proyecto.',
+  },
+  {
+    phase: 'Desarrollo',
+    title: 'Proceso de construcción',
+    description: 'Espacio reservado para mostrar componentes, pruebas parciales o avances de integración.',
+  },
+  {
+    phase: 'Prototipo',
+    title: 'Validación del prototipo',
+    description: 'Espacio reservado para presentar el prototipo durante sus pruebas funcionales.',
+  },
+  {
+    phase: 'Resultado',
+    title: 'Estado alcanzado',
+    description: 'Espacio reservado para mostrar el resultado más reciente y su evidencia visual.',
+  },
+]
+
+function createGallery(projectId, projectName) {
+  return galleryPhases.map((item, index) => {
+    const number = String(index + 1).padStart(2, '0')
+
+    return {
+      ...item,
+      src: `/projects/${projectId}/fase-${number}.webp`,
+      alt: `${projectName}: ${item.phase.toLowerCase()}`,
+      available: false,
+    }
+  })
+}
+
 export const projects = [
   {
     id: 'nia',
@@ -31,7 +67,7 @@ export const projects = [
       },
     ],
     technologies: ['ESP32', 'GPS NEO-6M', 'PlatformIO', 'PHP', 'MySQL', 'Leaflet'],
-    preview: null,
+    gallery: createGallery('nia', 'Notificación Inmediata de Alerta'),
     repository: {
       state: 'available',
       url: 'https://github.com/angelmon19/NIA',
@@ -70,7 +106,7 @@ export const projects = [
       },
     ],
     technologies: ['Robótica', 'Sensores', 'Simulación', 'Visión artificial', 'IA'],
-    preview: null,
+    gallery: createGallery('rcg', 'Robot Controlado por Gestos'),
     repository: {
       state: 'unpublished',
       url: null,
@@ -109,7 +145,7 @@ export const projects = [
       },
     ],
     technologies: ['PHP', 'MySQL', 'JavaScript', 'Power BI', 'ESP32', 'OEE'],
-    preview: null,
+    gallery: createGallery('sgi', 'Sistema de Gestión Inteligente'),
     repository: {
       state: 'empty',
       url: 'https://github.com/angelmon19/sgi-industrial',

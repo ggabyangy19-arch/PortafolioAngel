@@ -9,10 +9,9 @@ const professionalContact = {
   github: 'https://github.com/angelmon19',
 }
 
-// Place the PDF at public/documents/cv-angel-uriel-montero-cruz.pdf,
-// then change this flag to true to enable every CV action.
+// Public CV path shared by the hero and contact download actions.
 const cvPath = '/documents/cv-angel-uriel-montero-cruz.pdf'
-const cvAvailable = false
+const cvAvailable = true
 
 const menuIcon = `
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -89,28 +88,112 @@ const repositoryIcon = `
   </svg>
 `
 
-function renderProjectPreview(project) {
-  if (project.preview) {
+const previousIcon = `
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="m15 18-6-6 6-6" />
+  </svg>
+`
+
+const nextIcon = `
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="m9 18 6-6-6-6" />
+  </svg>
+`
+
+const expandIcon = `
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M8 3H3v5m13-5h5v5M8 21H3v-5m18 0v5h-5" />
+  </svg>
+`
+
+function renderGalleryMedia(item, projectCode) {
+  if (item.available) {
     return `
       <img
-        src="${project.preview.src}"
-        alt="${project.preview.alt}"
+        class="gallery-image"
+        src="${item.src}"
+        alt="${item.alt}"
         width="1200"
         height="750"
-        ${project.id === 'nia' ? 'fetchpriority="high"' : 'loading="lazy"'}
+        loading="lazy"
       />
     `
   }
 
+  const fileName = item.src.split('/').pop()
+
   return `
-    <div class="project-preview-placeholder" role="img" aria-label="Vista previa de ${project.name} pendiente de agregar">
-      <div class="preview-grid" aria-hidden="true"></div>
-      <span class="preview-code" aria-hidden="true">${project.code}</span>
-      <div class="preview-message">
-        <span>Vista previa</span>
-        <strong>Captura pendiente de integrar</strong>
+    <span class="project-preview-placeholder" aria-hidden="true">
+      <span class="preview-grid"></span>
+      <span class="preview-code">${projectCode}</span>
+      <span class="preview-message">
+        <span>${item.phase}</span>
+        <strong>Captura pendiente</strong>
+        <small>${fileName}</small>
+      </span>
+    </span>
+  `
+}
+
+function renderProjectGallery(project) {
+  return `
+    <section class="project-gallery" data-gallery data-project-id="${project.id}" aria-label="Galería de ${project.name}">
+      <div class="gallery-stage">
+        <div class="gallery-slides">
+          ${project.gallery.map((item, index) => `
+            <figure
+              class="gallery-slide${index === 0 ? ' gallery-slide-active' : ''}"
+              data-gallery-slide
+              aria-hidden="${index === 0 ? 'false' : 'true'}"
+              ${index === 0 ? '' : 'inert'}
+            >
+              <button
+                class="gallery-open"
+                type="button"
+                data-gallery-open
+                data-gallery-index="${index}"
+                aria-label="${item.available ? 'Ampliar' : 'Ver detalle de la captura pendiente para'} ${item.phase.toLowerCase()} de ${project.name}"
+              >
+                <span class="gallery-media">
+                  ${renderGalleryMedia(item, project.code)}
+                </span>
+                <span class="gallery-expand" aria-hidden="true">${expandIcon}</span>
+              </button>
+              <figcaption class="gallery-caption">
+                <span>${item.phase}</span>
+                <strong>${item.title}</strong>
+              </figcaption>
+            </figure>
+          `).join('')}
+        </div>
       </div>
-    </div>
+
+      <div class="gallery-toolbar">
+        <button class="gallery-arrow" type="button" data-gallery-previous aria-label="Imagen anterior">
+          ${previousIcon}
+        </button>
+        <span class="gallery-count" data-gallery-count aria-hidden="true">01 / 04</span>
+        <button class="gallery-arrow" type="button" data-gallery-next aria-label="Imagen siguiente">
+          ${nextIcon}
+        </button>
+      </div>
+
+      <div class="gallery-thumbnails" role="group" aria-label="Seleccionar fase del proyecto">
+        ${project.gallery.map((item, index) => `
+          <button
+            class="gallery-thumbnail${index === 0 ? ' gallery-thumbnail-active' : ''}"
+            type="button"
+            data-gallery-thumbnail
+            data-gallery-index="${index}"
+            ${index === 0 ? 'aria-current="true"' : ''}
+          >
+            <span>${String(index + 1).padStart(2, '0')}</span>
+            <strong>${item.phase}</strong>
+          </button>
+        `).join('')}
+      </div>
+      <span class="visually-hidden" data-gallery-announcement aria-live="polite"></span>
+    </section>
   `
 }
 
@@ -165,9 +248,7 @@ function renderProject(project, index) {
         ${isOpen ? '' : 'hidden'}
       >
         <div class="project-panel-inner">
-          <div class="project-preview">
-            ${renderProjectPreview(project)}
-          </div>
+          ${renderProjectGallery(project)}
 
           <div class="project-information">
             <p class="project-summary">${project.summary}</p>
@@ -505,11 +586,49 @@ document.querySelector('#app').innerHTML = `
               ${renderCvAction('button button-compact', 'Descargar CV', 'contact-cv-status')}
             </div>
           ` : ''}
-          <span class="visually-hidden" id="hero-cv-status">El archivo del currículum está pendiente de agregar.</span>
+          <span class="visually-hidden" id="hero-cv-status">
+            ${cvAvailable
+              ? 'El archivo del currículum está disponible para descarga.'
+              : 'El archivo del currículum está pendiente de agregar.'}
+          </span>
         </div>
       </div>
     </section>
   </main>
+
+  <dialog
+    class="gallery-dialog"
+    id="gallery-dialog"
+    aria-labelledby="gallery-dialog-title"
+    aria-describedby="gallery-dialog-description gallery-dialog-count"
+  >
+    <div class="gallery-dialog-shell">
+      <header class="gallery-dialog-header">
+        <div>
+          <span class="gallery-dialog-kicker" id="gallery-dialog-project"></span>
+          <h2 id="gallery-dialog-title"></h2>
+        </div>
+        <button class="gallery-dialog-close" type="button" data-gallery-dialog-close aria-label="Cerrar vista ampliada">
+          ${closeIcon}
+        </button>
+      </header>
+
+      <div class="gallery-dialog-stage">
+        <button class="gallery-dialog-arrow gallery-dialog-previous" type="button" data-gallery-dialog-previous aria-label="Imagen anterior">
+          ${previousIcon}
+        </button>
+        <div class="gallery-dialog-media" id="gallery-dialog-media"></div>
+        <button class="gallery-dialog-arrow gallery-dialog-next" type="button" data-gallery-dialog-next aria-label="Imagen siguiente">
+          ${nextIcon}
+        </button>
+      </div>
+
+      <footer class="gallery-dialog-footer">
+        <p id="gallery-dialog-description"></p>
+        <span id="gallery-dialog-count"></span>
+      </footer>
+    </div>
+  </dialog>
 
   <footer class="footer">
     <div class="container footer-content">
@@ -528,6 +647,211 @@ const navLinks = [...document.querySelectorAll('.nav-link')]
 const sections = [...document.querySelectorAll('[data-nav-section]')]
 const projectFiles = [...document.querySelectorAll('[data-project-file]')]
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+const galleryDialog = document.querySelector('#gallery-dialog')
+const galleryDialogProject = document.querySelector('#gallery-dialog-project')
+const galleryDialogTitle = document.querySelector('#gallery-dialog-title')
+const galleryDialogMedia = document.querySelector('#gallery-dialog-media')
+const galleryDialogDescription = document.querySelector('#gallery-dialog-description')
+const galleryDialogCount = document.querySelector('#gallery-dialog-count')
+const projectsById = new Map(projects.map((project) => [project.id, project]))
+let dialogState = { controller: null, opener: null }
+
+function updateGalleryDialog() {
+  const { controller } = dialogState
+  if (!controller) return
+
+  const { project, activeIndex } = controller
+  const item = project.gallery[activeIndex]
+
+  galleryDialogProject.textContent = `${project.code} · ${item.phase}`
+  galleryDialogTitle.textContent = item.title
+  galleryDialogDescription.textContent = item.description
+  galleryDialogCount.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(project.gallery.length).padStart(2, '0')}`
+  galleryDialogMedia.innerHTML = renderGalleryMedia(item, project.code)
+  galleryDialogMedia.setAttribute(
+    'aria-label',
+    item.available ? item.alt : `${item.phase} de ${project.name}: captura pendiente`,
+  )
+  galleryDialogMedia.setAttribute('role', 'img')
+}
+
+function createGalleryController(element) {
+  const project = projectsById.get(element.dataset.projectId)
+  const slides = [...element.querySelectorAll('[data-gallery-slide]')]
+  const thumbnails = [...element.querySelectorAll('[data-gallery-thumbnail]')]
+  const count = element.querySelector('[data-gallery-count]')
+  const announcement = element.querySelector('[data-gallery-announcement]')
+  let intervalId = null
+
+  const controller = {
+    element,
+    project,
+    activeIndex: 0,
+    stop() {
+      window.clearInterval(intervalId)
+      intervalId = null
+    },
+    start() {
+      controller.stop()
+
+      const projectIsOpen = element.closest('[data-project-file]').classList.contains('project-file-open')
+      const canRotate = !prefersReducedMotion.matches
+        && !galleryDialog.open
+        && document.visibilityState === 'visible'
+        && projectIsOpen
+        && !element.matches(':hover')
+        && !element.contains(document.activeElement)
+
+      if (!canRotate) return
+
+      intervalId = window.setInterval(() => {
+        controller.select(controller.activeIndex + 1)
+      }, 5000)
+    },
+    select(index, { announce = false } = {}) {
+      const total = project.gallery.length
+      controller.activeIndex = (index + total) % total
+
+      slides.forEach((slide, slideIndex) => {
+        const isActive = slideIndex === controller.activeIndex
+        slide.classList.toggle('gallery-slide-active', isActive)
+        slide.setAttribute('aria-hidden', String(!isActive))
+        slide.toggleAttribute('inert', !isActive)
+      })
+
+      thumbnails.forEach((thumbnail, thumbnailIndex) => {
+        const isActive = thumbnailIndex === controller.activeIndex
+        thumbnail.classList.toggle('gallery-thumbnail-active', isActive)
+        thumbnail.toggleAttribute('aria-current', isActive)
+      })
+
+      const item = project.gallery[controller.activeIndex]
+      count.textContent = `${String(controller.activeIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`
+
+      if (announce) {
+        announcement.textContent = `${item.phase}: ${item.title}`
+      }
+
+      if (dialogState.controller === controller) {
+        updateGalleryDialog()
+      }
+    },
+  }
+
+  element.querySelector('[data-gallery-previous]').addEventListener('click', () => {
+    controller.stop()
+    controller.select(controller.activeIndex - 1, { announce: true })
+  })
+
+  element.querySelector('[data-gallery-next]').addEventListener('click', () => {
+    controller.stop()
+    controller.select(controller.activeIndex + 1, { announce: true })
+  })
+
+  thumbnails.forEach((thumbnail) => {
+    thumbnail.addEventListener('click', () => {
+      controller.stop()
+      controller.select(Number(thumbnail.dataset.galleryIndex), { announce: true })
+    })
+  })
+
+  element.querySelectorAll('[data-gallery-open]').forEach((openButton) => {
+    openButton.addEventListener('click', () => {
+      controller.select(Number(openButton.dataset.galleryIndex))
+      controller.stop()
+      dialogState = { controller, opener: openButton }
+      updateGalleryDialog()
+      galleryDialog.showModal()
+      document.body.classList.add('dialog-open')
+    })
+  })
+
+  element.addEventListener('mouseenter', () => controller.stop())
+  element.addEventListener('mouseleave', () => controller.start())
+  element.addEventListener('focusin', () => controller.stop())
+  element.addEventListener('focusout', (event) => {
+    if (!element.contains(event.relatedTarget)) controller.start()
+  })
+  element.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+
+    event.preventDefault()
+    controller.stop()
+    const direction = event.key === 'ArrowLeft' ? -1 : 1
+    controller.select(controller.activeIndex + direction, { announce: true })
+
+    const focusedThumbnail = event.target.closest('[data-gallery-thumbnail]')
+    const focusedMedia = event.target.closest('[data-gallery-open]')
+
+    if (focusedThumbnail) thumbnails[controller.activeIndex].focus()
+    if (focusedMedia) {
+      element.querySelector('.gallery-slide-active [data-gallery-open]').focus()
+    }
+  })
+
+  return controller
+}
+
+const galleryControllers = [...document.querySelectorAll('[data-gallery]')].map(createGalleryController)
+
+function closeGalleryDialog() {
+  if (galleryDialog.open) galleryDialog.close()
+}
+
+document.querySelector('[data-gallery-dialog-close]').addEventListener('click', closeGalleryDialog)
+document.querySelector('[data-gallery-dialog-previous]').addEventListener('click', () => {
+  dialogState.controller?.select(dialogState.controller.activeIndex - 1, {
+    announce: true,
+  })
+})
+document.querySelector('[data-gallery-dialog-next]').addEventListener('click', () => {
+  dialogState.controller?.select(dialogState.controller.activeIndex + 1, {
+    announce: true,
+  })
+})
+
+galleryDialog.addEventListener('click', (event) => {
+  if (event.target === galleryDialog) closeGalleryDialog()
+})
+
+galleryDialog.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    dialogState.controller?.select(dialogState.controller.activeIndex - 1)
+  }
+
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    dialogState.controller?.select(dialogState.controller.activeIndex + 1)
+  }
+})
+
+galleryDialog.addEventListener('close', () => {
+  document.body.classList.remove('dialog-open')
+  const { controller, opener } = dialogState
+  dialogState = { controller: null, opener: null }
+
+  const activeMediaButton = controller?.element.querySelector(
+    '.gallery-slide-active [data-gallery-open]',
+  )
+  activeMediaButton?.focus()
+  if (!activeMediaButton) opener?.focus()
+  controller?.start()
+})
+
+document.addEventListener('visibilitychange', () => {
+  galleryControllers.forEach((controller) => {
+    if (document.visibilityState === 'visible') controller.start()
+    else controller.stop()
+  })
+})
+
+prefersReducedMotion.addEventListener('change', () => {
+  galleryControllers.forEach((controller) => {
+    if (prefersReducedMotion.matches) controller.stop()
+    else controller.start()
+  })
+})
 
 function setMenuState(isOpen, { restoreFocus = false } = {}) {
   navMenu.classList.toggle('nav-menu-open', isOpen)
@@ -576,9 +900,14 @@ function setOpenProject(selectedFile) {
           { opacity: 0, transform: 'translateY(-8px)' },
           { opacity: 1, transform: 'translateY(0)' },
         ],
-        { duration: 260, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+        { duration: 260, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
       )
     }
+  })
+
+  galleryControllers.forEach((controller) => {
+    if (controller.element.closest('[data-project-file]') === selectedFile) controller.start()
+    else controller.stop()
   })
 }
 
@@ -590,6 +919,8 @@ projectFiles.forEach((projectFile) => {
     setOpenProject(projectFile)
   })
 })
+
+galleryControllers.forEach((controller) => controller.start())
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
