@@ -2,40 +2,42 @@
 
 ## Fase actual
 
-Rediseño frontend minimalista técnico implementado. El portafolio continúa como una aplicación estática de una sola página construida con Vite, JavaScript y CSS vanilla.
+Portafolio estático de una sola página construido con Vite, JavaScript y CSS vanilla. La interfaz editorial industrial está implementada con contenido real, galerías de proyectos y evidencia de herramientas de ingeniería.
 
 ## Trabajo completado
 
-- Se reemplazó la estética oscura con gradientes por una dirección editorial industrial clara.
-- Se separaron los datos de NIA, RCG y SGI en `src/data/projects.js`.
-- Se sustituyeron las tarjetas de proyecto por expedientes desplegables accesibles.
-- NIA se abre inicialmente y solo puede permanecer abierto un expediente a la vez.
-- Se añadieron estados distintos para repositorio disponible, repositorio vacío y repositorio no publicado.
-- Se añadió una galería de cuatro fases por proyecto con rotación, controles manuales y vista ampliada accesible.
-- Se prepararon las doce rutas finales de imágenes bajo `public/projects/` y placeholders explícitos mientras faltan los archivos.
-- Se cambió la navegación interna principal a enlaces de ancla semánticos.
-- Se añadió el perfil público de GitHub al bloque de contacto.
-- Se integró el currículum PDF y se habilitaron las acciones de descarga en el hero y contacto.
-- Se actualizó la tipografía, el color del navegador y el favicon.
-- Se corrigió una línea inválida en `.gitignore`.
+- Se eliminó por completo el proyecto RCG; el portafolio presenta únicamente NIA y SGI.
+- Se retiraron todos los placeholders, estados de “pendiente” y mensajes provisionales del sitio.
+- Se integraron las capturas reales de NIA (3) y SGI (6) en galerías con rotación, controles manuales y vista ampliada accesible.
+- Se añadió el bloque de herramientas dentro de Competencias con evidencia de SolidWorks, TIA Portal, Factory I/O y FluidSIM.
+- Se incorporaron Claude Code, Codex, ChatGPT, Cursor, GitHub Copilot y Gemini como parte del flujo de desarrollo asistido por IA.
+- Se añadió el ancla `#herramientas` y su enlace en la navegación principal.
+- Se simplificaron las acciones de contacto y descarga del currículum.
+- Se eliminaron assets sin uso y estilos de plantilla.
+- Se actualizaron los metadatos de proyectos y herramientas en `src/data/`.
 
 ## Decisiones vigentes
 
 - No se agregaron frameworks ni dependencias de interfaz.
-- Los nombres de proyecto visibles son NIA (Notificación Inmediata de Alerta), RCG (Robot Controlado por Gestos) y SGI (Sistema de Gestión Inteligente).
-- Las capturas no se inventan: mientras no existan archivos verificados se muestra un placeholder explícito para cada fase.
+- Los proyectos visibles son NIA (Notificación Inmediata de Alerta) y SGI (Sistema de Gestión Inteligente).
+- Solo NIA enlaza a un repositorio público con contenido verificable.
+- Las galerías muestran únicamente imágenes reales; no se generan marcos vacíos ni textos de captura pendiente.
 - La rotación se detiene durante hover, foco, interacción manual, pestaña oculta, vista ampliada y preferencias de movimiento reducido.
-- Solo NIA ofrece una acción activa hacia GitHub porque es el único repositorio relacionado con contenido público verificable.
-- El repositorio de SGI existe, pero se presenta como pendiente de contenido.
+- Las herramientas de IA se presentan dentro de la sección de Competencias, sin una sección independiente.
+- La numeración visible conserva Competencias como 03 y Formación como 04.
+
+## Verificación reciente
+
+- `npm run build` completado sin errores.
+- Revisión en navegador a 1440, 768 y 390 px: sin desbordamiento horizontal, sin imágenes rotas y sin errores de consola.
+- Galerías verificadas con 3 capturas de NIA y 6 de SGI; bloque de herramientas con 4 fichas de ingeniería y 6 herramientas de IA.
+- Navegación `#herramientas` activa y menú móvil funcional.
 
 ## Pendientes de contenido
 
-- Agregar las doce capturas optimizadas con relación 16:10 siguiendo `public/projects/README.md` y marcar cada archivo disponible en `src/data/projects.js`.
-- Alinear el README de NIA, que todavía desarrolla la sigla como "Notificación Inmediata de Auxilio", con el nombre oficial aprobado "Notificación Inmediata de Alerta".
-- Publicar el repositorio de RCG y añadir su URL en `src/data/projects.js`.
-- Publicar contenido en `https://github.com/angelmon19/sgi-industrial` y habilitar su acción.
+- Alinear el README del repositorio NIA, que desarrolla la sigla como “Notificación Inmediata de Auxilio”, con el nombre visible del portafolio.
 - Definir la URL pública del portafolio antes de añadir metadatos canónicos y `og:url`.
 
 ## Próxima acción recomendada
 
-Integrar las tres capturas reales y revisar la redacción de cada expediente contra la documentación definitiva de sus repositorios.
+Revisar la redacción de cada expediente contra la documentación definitiva de sus repositorios y definir la URL pública para completar los metadatos.

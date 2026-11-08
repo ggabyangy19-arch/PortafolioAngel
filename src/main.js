@@ -1,7 +1,7 @@
 import './style.css'
 import { projects } from './data/projects.js'
+import { engineeringTools, aiTools } from './data/tools.js'
 
-// Replace each empty value with the verified professional contact detail.
 const professionalContact = {
   phone: '(55) 8358-1780',
   email: 'angelmonterocruz19@gmail.com',
@@ -9,9 +9,7 @@ const professionalContact = {
   github: 'https://github.com/angelmon19',
 }
 
-// Public CV path shared by the hero and contact download actions.
 const cvPath = '/documents/cv-angel-uriel-montero-cruz.pdf'
-const cvAvailable = true
 
 const menuIcon = `
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -31,40 +29,16 @@ const downloadIcon = `
   </svg>
 `
 
-function renderCvAction(className, label, statusId) {
-  if (cvAvailable) {
-    return `
-      <a href="${cvPath}" class="${className}" download>
-        ${downloadIcon}
-        <span>${label}</span>
-      </a>
-    `
-  }
-
+function renderCvAction(className, label) {
   return `
-    <button
-      type="button"
-      class="${className} button-disabled"
-      data-cv-path="${cvPath}"
-      aria-describedby="${statusId}"
-      disabled
-    >
+    <a href="${cvPath}" class="${className}" download>
       ${downloadIcon}
       <span>${label}</span>
-    </button>
+    </a>
   `
 }
 
 function renderContactItem(label, value, type = 'url') {
-  if (!value) {
-    return `
-      <div class="contact-item contact-item-pending">
-        <span>${label}</span>
-        <strong>Pendiente de agregar</strong>
-      </div>
-    `
-  }
-
   const href = type === 'email'
     ? `mailto:${value}`
     : type === 'tel'
@@ -106,36 +80,23 @@ const expandIcon = `
   </svg>
 `
 
-function renderGalleryMedia(item, projectCode) {
-  if (item.available) {
-    return `
-      <img
-        class="gallery-image"
-        src="${item.src}"
-        alt="${item.alt}"
-        width="1200"
-        height="750"
-        loading="lazy"
-      />
-    `
-  }
-
-  const fileName = item.src.split('/').pop()
-
+function renderGalleryMedia(item) {
   return `
-    <span class="project-preview-placeholder" aria-hidden="true">
-      <span class="preview-grid"></span>
-      <span class="preview-code">${projectCode}</span>
-      <span class="preview-message">
-        <span>${item.phase}</span>
-        <strong>Captura pendiente</strong>
-        <small>${fileName}</small>
-      </span>
-    </span>
+    <img
+      class="gallery-image"
+      src="${item.src}"
+      alt="${item.alt}"
+      width="1200"
+      height="750"
+      loading="lazy"
+      decoding="async"
+    />
   `
 }
 
 function renderProjectGallery(project) {
+  const total = project.gallery.length
+
   return `
     <section class="project-gallery" data-gallery data-project-id="${project.id}" aria-label="Galería de ${project.name}">
       <div class="gallery-stage">
@@ -152,10 +113,10 @@ function renderProjectGallery(project) {
                 type="button"
                 data-gallery-open
                 data-gallery-index="${index}"
-                aria-label="${item.available ? 'Ampliar' : 'Ver detalle de la captura pendiente para'} ${item.phase.toLowerCase()} de ${project.name}"
+                aria-label="Ampliar ${item.title} de ${project.name}"
               >
                 <span class="gallery-media">
-                  ${renderGalleryMedia(item, project.code)}
+                  ${renderGalleryMedia(item)}
                 </span>
                 <span class="gallery-expand" aria-hidden="true">${expandIcon}</span>
               </button>
@@ -172,13 +133,18 @@ function renderProjectGallery(project) {
         <button class="gallery-arrow" type="button" data-gallery-previous aria-label="Imagen anterior">
           ${previousIcon}
         </button>
-        <span class="gallery-count" data-gallery-count aria-hidden="true">01 / 04</span>
+        <span class="gallery-count" data-gallery-count aria-hidden="true">01 / ${String(total).padStart(2, '0')}</span>
         <button class="gallery-arrow" type="button" data-gallery-next aria-label="Imagen siguiente">
           ${nextIcon}
         </button>
       </div>
 
-      <div class="gallery-thumbnails" role="group" aria-label="Seleccionar fase del proyecto">
+      <div
+        class="gallery-thumbnails"
+        style="--gallery-count: ${total}"
+        role="group"
+        aria-label="Seleccionar fase del proyecto"
+      >
         ${project.gallery.map((item, index) => `
           <button
             class="gallery-thumbnail${index === 0 ? ' gallery-thumbnail-active' : ''}"
@@ -198,26 +164,73 @@ function renderProjectGallery(project) {
 }
 
 function renderRepositoryAction(repository) {
-  if (repository.state === 'available') {
-    return `
-      <a class="project-repository" href="${repository.url}" target="_blank" rel="noopener noreferrer">
-        ${repositoryIcon}
-        <span>Ver repositorio</span>
-      </a>
-    `
-  }
+  if (!repository?.url) return ''
 
   return `
-    <span class="project-repository project-repository-pending" aria-disabled="true">
+    <a class="project-repository" href="${repository.url}" target="_blank" rel="noopener noreferrer">
       ${repositoryIcon}
-      <span>${repository.message}</span>
-    </span>
+      <span>Ver repositorio</span>
+    </a>
+  `
+}
+
+function renderToolCard(tool) {
+  return `
+    <article class="tool-card">
+      <div class="tool-card-copy">
+        <header class="tool-card-header">
+          <span class="tool-code">${tool.code}</span>
+          <span class="tool-field">${tool.field}</span>
+        </header>
+        <h3>${tool.name}</h3>
+        <p>${tool.description}</p>
+      </div>
+      <div class="tool-evidence-grid">
+        ${tool.evidence.map((item) => `
+          <figure class="tool-evidence">
+            <img
+              src="${item.src}"
+              alt="${item.alt}"
+              width="800"
+              height="500"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>${item.caption}</figcaption>
+          </figure>
+        `).join('')}
+      </div>
+    </article>
+  `
+}
+
+function renderTools() {
+  return `
+    <div class="tool-cards">
+      ${engineeringTools.map(renderToolCard).join('')}
+    </div>
+
+    <div class="ai-tools">
+      <div class="ai-tools-heading">
+        <span class="panel-label">Desarrollo asistido por IA</span>
+        <p>Herramientas integradas al flujo de trabajo para implementación, revisión y documentación.</p>
+      </div>
+      <ul class="ai-tools-list" aria-label="Herramientas de IA">
+        ${aiTools.map((tool) => `
+          <li>
+            <strong>${tool.name}</strong>
+            <span>${tool.role}</span>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
   `
 }
 
 function renderProject(project, index) {
   const isOpen = index === 0
   const number = String(index + 1).padStart(2, '0')
+  const hasGallery = project.gallery.length > 0
 
   return `
     <article class="project-file${isOpen ? ' project-file-open' : ''}" data-project-file>
@@ -247,8 +260,8 @@ function renderProject(project, index) {
         aria-labelledby="project-trigger-${project.id}"
         ${isOpen ? '' : 'hidden'}
       >
-        <div class="project-panel-inner">
-          ${renderProjectGallery(project)}
+        <div class="project-panel-inner${hasGallery ? '' : ' project-panel-inner-single'}">
+          ${hasGallery ? renderProjectGallery(project) : ''}
 
           <div class="project-information">
             <p class="project-summary">${project.summary}</p>
@@ -301,6 +314,7 @@ document.querySelector('#app').innerHTML = `
         <a class="nav-link" href="#perfil">Perfil</a>
         <a class="nav-link" href="#proyectos">Proyectos</a>
         <a class="nav-link" href="#competencias">Competencias</a>
+        <a class="nav-link" href="#herramientas">Herramientas</a>
         <a class="nav-link" href="#formacion">Formación</a>
         <a class="nav-link" href="#contacto">Contacto</a>
       </div>
@@ -332,7 +346,7 @@ document.querySelector('#app').innerHTML = `
               Ver casos de proyecto
             </a>
 
-            ${renderCvAction('button button-secondary', 'Descargar CV', 'hero-cv-status')}
+            ${renderCvAction('button button-secondary', 'Descargar CV')}
 
             <a class="button button-text" href="#contacto">Contactar</a>
           </div>
@@ -464,47 +478,64 @@ document.querySelector('#app').innerHTML = `
       </div>
     </section>
 
-    <section class="section section-secondary" id="competencias" data-nav-section>
+    <section class="section section-secondary" aria-labelledby="competencias-title">
       <div class="container">
-        <div class="section-heading">
-          <span class="section-number" aria-hidden="true">03</span>
-          <div>
-            <span class="eyebrow">Conocimientos aplicados</span>
-            <h2>Competencias</h2>
+        <div id="competencias" data-nav-section>
+          <div class="section-heading">
+            <span class="section-number" aria-hidden="true">03</span>
+            <div>
+              <span class="eyebrow">Conocimientos aplicados</span>
+              <h2 id="competencias-title">Competencias</h2>
+            </div>
+          </div>
+
+          <div class="competencies-grid">
+            <article class="competency-panel competency-panel-primary">
+              <span class="panel-label">Enfoque principal</span>
+              <h3>Gestión de proyectos</h3>
+              <p>Herramientas y prácticas utilizadas en la definición, planeación y seguimiento del trabajo.</p>
+              <ul class="competency-list">
+                <li>PMI y PMBOK</li><li>Scrum y SBOK</li><li>Definición de alcance</li>
+                <li>Requerimientos</li><li>EDT/WBS</li><li>Cronogramas</li>
+                <li>Matriz RACI</li><li>Gestión de interesados</li><li>Riesgos</li>
+                <li>Backlog y sprints</li><li>Documentación técnica</li>
+              </ul>
+            </article>
+
+            <article class="competency-panel">
+              <span class="panel-label">Base técnica</span>
+              <h3>Capacidades técnicas complementarias</h3>
+              <div class="technical-groups">
+                <div>
+                  <h4>Automatización e IoT</h4>
+                  <p>ESP32, Arduino, sensores, GPS, PLC, OEE y fundamentos de SCADA.</p>
+                </div>
+                <div>
+                  <h4>Desarrollo y datos</h4>
+                  <p>PHP, JavaScript, Python, HTML, CSS, SQL, MySQL, Power BI, Git y GitHub.</p>
+                </div>
+                <div>
+                  <h4>Herramientas</h4>
+                  <p>SolidWorks, TIA Portal, Factory I/O, FluidSIM, ProjectLibre, Lucidchart, XAMPP, VS Code, Microsoft Office y asistentes de IA para desarrollo.</p>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
 
-        <div class="competencies-grid">
-          <article class="competency-panel competency-panel-primary">
-            <span class="panel-label">Enfoque principal</span>
-            <h3>Gestión de proyectos</h3>
-            <p>Herramientas y prácticas utilizadas en la definición, planeación y seguimiento del trabajo.</p>
-            <ul class="competency-list">
-              <li>PMI y PMBOK</li><li>Scrum y SBOK</li><li>Definición de alcance</li>
-              <li>Requerimientos</li><li>EDT/WBS</li><li>Cronogramas</li>
-              <li>Matriz RACI</li><li>Gestión de interesados</li><li>Riesgos</li>
-              <li>Backlog y sprints</li><li>Documentación técnica</li>
-            </ul>
-          </article>
-
-          <article class="competency-panel">
-            <span class="panel-label">Base técnica</span>
-            <h3>Capacidades técnicas complementarias</h3>
-            <div class="technical-groups">
-              <div>
-                <h4>Automatización e IoT</h4>
-                <p>ESP32, Arduino, sensores, GPS, PLC, OEE y fundamentos de SCADA.</p>
-              </div>
-              <div>
-                <h4>Desarrollo y datos</h4>
-                <p>PHP, JavaScript, Python, HTML, CSS, SQL, MySQL, Power BI, Git y GitHub.</p>
-              </div>
-              <div>
-                <h4>Herramientas</h4>
-                <p>ProjectLibre, Lucidchart, XAMPP, VS Code, Microsoft Office y TIA Portal.</p>
-              </div>
+        <div class="tools-evidence" id="herramientas" data-nav-section>
+          <div class="tools-heading">
+            <div>
+              <span class="eyebrow">Herramientas aplicadas</span>
+              <h2>Software de ingeniería y desarrollo asistido</h2>
             </div>
-          </article>
+            <p>
+              Evidencia de las herramientas utilizadas en diseño, automatización,
+              simulación y documentación técnica de los proyectos.
+            </p>
+          </div>
+
+          ${renderTools()}
         </div>
       </div>
     </section>
@@ -577,20 +608,13 @@ document.querySelector('#app').innerHTML = `
           ${renderContactItem('LinkedIn', professionalContact.linkedin)}
           ${renderContactItem('GitHub', professionalContact.github)}
 
-          ${cvAvailable ? `
-            <div class="contact-item contact-item-cv">
-              <div>
-                <span>Currículum</span>
-                <strong id="contact-cv-status">Archivo disponible</strong>
-              </div>
-              ${renderCvAction('button button-compact', 'Descargar CV', 'contact-cv-status')}
+          <div class="contact-item contact-item-cv">
+            <div>
+              <span>Currículum</span>
+              <strong>Ingeniería Mecatrónica · PDF</strong>
             </div>
-          ` : ''}
-          <span class="visually-hidden" id="hero-cv-status">
-            ${cvAvailable
-              ? 'El archivo del currículum está disponible para descarga.'
-              : 'El archivo del currículum está pendiente de agregar.'}
-          </span>
+            ${renderCvAction('button button-compact', 'Descargar CV')}
+          </div>
         </div>
       </div>
     </section>
@@ -667,12 +691,7 @@ function updateGalleryDialog() {
   galleryDialogTitle.textContent = item.title
   galleryDialogDescription.textContent = item.description
   galleryDialogCount.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(project.gallery.length).padStart(2, '0')}`
-  galleryDialogMedia.innerHTML = renderGalleryMedia(item, project.code)
-  galleryDialogMedia.setAttribute(
-    'aria-label',
-    item.available ? item.alt : `${item.phase} de ${project.name}: captura pendiente`,
-  )
-  galleryDialogMedia.setAttribute('role', 'img')
+  galleryDialogMedia.innerHTML = renderGalleryMedia(item)
 }
 
 function createGalleryController(element) {

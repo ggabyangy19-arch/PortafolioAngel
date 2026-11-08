@@ -1,40 +1,4 @@
-const galleryPhases = [
-  {
-    phase: 'Concepto',
-    title: 'Definición inicial',
-    description: 'Espacio reservado para documentar el planteamiento y los primeros esquemas del proyecto.',
-  },
-  {
-    phase: 'Desarrollo',
-    title: 'Proceso de construcción',
-    description: 'Espacio reservado para mostrar componentes, pruebas parciales o avances de integración.',
-  },
-  {
-    phase: 'Prototipo',
-    title: 'Validación del prototipo',
-    description: 'Espacio reservado para presentar el prototipo durante sus pruebas funcionales.',
-  },
-  {
-    phase: 'Resultado',
-    title: 'Estado alcanzado',
-    description: 'Espacio reservado para mostrar el resultado más reciente y su evidencia visual.',
-  },
-]
-
-function createGallery(projectId, projectName) {
-  return galleryPhases.map((item, index) => {
-    const number = String(index + 1).padStart(2, '0')
-
-    return {
-      ...item,
-      src: `/projects/${projectId}/fase-${number}.webp`,
-      alt: `${projectName}: ${item.phase.toLowerCase()}`,
-      available: false,
-    }
-  })
-}
-
-export const projects = [
+﻿export const projects = [
   {
     id: 'nia',
     code: 'NIA',
@@ -67,50 +31,34 @@ export const projects = [
       },
     ],
     technologies: ['ESP32', 'GPS NEO-6M', 'PlatformIO', 'PHP', 'MySQL', 'Leaflet'],
-    gallery: createGallery('nia', 'Notificación Inmediata de Alerta'),
-    repository: {
-      state: 'available',
-      url: 'https://github.com/angelmon19/NIA',
-      message: 'Código y documentación disponibles',
-    },
-  },
-  {
-    id: 'rcg',
-    code: 'RCG',
-    name: 'Robot Controlado por Gestos',
-    category: 'Robótica e inteligencia artificial',
-    status: 'Planeación y desarrollo',
-    statusTone: 'active',
-    summary:
-      'Proyecto multidisciplinario para controlar un brazo robótico mediante gestos, sensores y reconocimiento asistido por inteligencia artificial.',
-    details: [
+    gallery: [
       {
-        label: 'Problema',
-        value:
-          'Explorar una interacción natural y sin contacto para operar un sistema robótico con orientación industrial.',
+        phase: 'Interfaz',
+        title: 'Centro de respuesta',
+        description:
+          'Panel de monitoreo con alertas activas, mapa de ubicaciones y estado del dispositivo.',
+        src: '/images/optimized/NIA-Dashboard.jpg',
+        alt: 'Centro de respuesta de NIA con indicadores, mapa de alertas y detalle del dispositivo.',
       },
       {
-        label: 'Participación',
-        value:
-          'Project Manager de un equipo de cuatro integrantes, con coordinación de objetivos, roles y entregables.',
+        phase: 'Datos',
+        title: 'Base de datos',
+        description:
+          'Tablas de alertas, historial de estados, dispositivos y contactos de emergencia.',
+        src: '/images/NIA-Database.png',
+        alt: 'Tablas de la base de datos de NIA en phpMyAdmin.',
       },
       {
-        label: 'Gestión aplicada',
-        value:
-          'Distribución de responsabilidades, cronograma, identificación de riesgos y análisis de aplicaciones industriales.',
-      },
-      {
-        label: 'Estado actual',
-        value:
-          'Planeación del proyecto, definición de roles y análisis técnico inicial.',
+        phase: 'Hardware',
+        title: 'Prototipo',
+        description:
+          'ESP32, GPS NEO-6M y módulo de alimentación montados sobre protoboard.',
+        src: '/images/optimized/NIA-Prototipo.jpg',
+        alt: 'Prototipo de NIA con ESP32, módulo GPS y portapilas sobre protoboard.',
       },
     ],
-    technologies: ['Robótica', 'Sensores', 'Simulación', 'Visión artificial', 'IA'],
-    gallery: createGallery('rcg', 'Robot Controlado por Gestos'),
     repository: {
-      state: 'unpublished',
-      url: null,
-      message: 'Repositorio pendiente de publicación',
+      url: 'https://github.com/angelmon19/NIA',
     },
   },
   {
@@ -145,11 +93,55 @@ export const projects = [
       },
     ],
     technologies: ['PHP', 'MySQL', 'JavaScript', 'Power BI', 'ESP32', 'OEE'],
-    gallery: createGallery('sgi', 'Sistema de Gestión Inteligente'),
-    repository: {
-      state: 'empty',
-      url: 'https://github.com/angelmon19/sgi-industrial',
-      message: 'Repositorio creado; contenido pendiente de publicación',
-    },
+    gallery: [
+      {
+        phase: 'Gestión',
+        title: 'Project Charter',
+        description:
+          'Definición del proyecto, alcance, entregables y metodología de trabajo.',
+        src: '/images/optimized/SGI-ProjectCharter.jpg',
+        alt: 'Documento Project Charter del Sistema de Gestión Industrial.',
+      },
+      {
+        phase: 'Gestión',
+        title: 'Declaración de alcance',
+        description:
+          'Objetivos, módulos funcionales y arquitectura prevista del sistema.',
+        src: '/images/optimized/SGI-ProjectScope.jpg',
+        alt: 'Documento de declaración de alcance del Sistema de Gestión Integral.',
+      },
+      {
+        phase: 'Sistema',
+        title: 'Acceso al sistema',
+        description:
+          'Pantalla de inicio de sesión para usuarios de planta.',
+        src: '/images/SGI-Iniciodesesion.png',
+        alt: 'Pantalla de inicio de sesión del sistema SGI.',
+      },
+      {
+        phase: 'Sistema',
+        title: 'Catálogo de máquinas',
+        description:
+          'Registro y administración de máquinas, áreas y estados operativos.',
+        src: '/images/SGI-CreacionDeCatalogos.png',
+        alt: 'Formulario de alta de máquinas en el sistema SGI.',
+      },
+      {
+        phase: 'Sistema',
+        title: 'Dashboard operativo',
+        description:
+          'Resumen de producción, calidad, máquinas y operadores activos.',
+        src: '/images/SGI-Dashboard.png',
+        alt: 'Dashboard con indicadores de producción y calidad del sistema SGI.',
+      },
+      {
+        phase: 'Datos',
+        title: 'Base de datos',
+        description:
+          'Tablas del sistema gestionadas desde phpMyAdmin en el entorno local.',
+        src: '/images/SGI-XAMPP.png',
+        alt: 'Listado de tablas de la base de datos de SGI en phpMyAdmin.',
+      },
+    ],
   },
 ]
