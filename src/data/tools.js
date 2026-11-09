@@ -75,22 +75,22 @@
       {
         src: '/images/FluidSIM-01.png',
         alt: 'Diagrama de potencia, control y esquema de escalera en FluidSIM.',
-        caption: 'Diagrama eléctrico y de control',
+        caption: 'Diagrama eléctrico y de control con KOP',
       },
       {
         src: '/images/FluidSIM-02.png',
         alt: 'Lógica de relevadores representada en FluidSIM.',
-        caption: 'Lógica de relevadores',
+        caption: 'Circuito elctroneumático',
       },
       {
         src: '/images/FluidSIM-03.png',
         alt: 'Circuito neumático con cilindros y válvulas en FluidSIM.',
-        caption: 'Circuito neumático',
+        caption: 'Circuito neumático por Metodo de Cascada',
       },
       {
         src: '/images/FluidSIM-04.png',
         alt: 'Circuito neumático con electroválvulas en FluidSIM.',
-        caption: 'Control electro-neumático',
+        caption: 'Control neumatico Metodo de paso a paso',
       },
     ],
   },
